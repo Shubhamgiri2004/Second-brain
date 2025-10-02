@@ -13,13 +13,20 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/mongoose": "^5.11.96",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "mongoose": "^8.18.3"
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.0",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.6.1",
+    "bcrypt": "^6.0.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
