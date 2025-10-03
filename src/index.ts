@@ -25,7 +25,7 @@ app.post("/signup", async (req, res) => {
         })
     }
     try {
-        const { username, password} : UserType = parseResult.data;
+        const { username, password} = parseResult.data;
         const existingUser = await UserModel.findOne({username});
         
         if(!existingUser) return res.json({
@@ -53,7 +53,43 @@ app.post("/signup", async (req, res) => {
 
 
 app.post("/signIn",  async (req, res)=>{
+    const parseResult = signValidation.safeParse(req.body);
 
+    if(!parseResult.success) {
+        return res.status(statusCodes.NotFound).json({
+            message: "User can't be find. Please login again"
+        })
+    }
+
+    try{
+        const {username, password} = parseResult.data;
+        const userResponse = await UserModel.findOne({username}).select("+password");
+
+        if(!userResponse){
+            return res.status(statusCodes.NotFound).json({
+                message: "user can't find "
+            })
+        }
+
+        const match = await userResponse.matchPassword(password);
+        if(!match) {
+            return res.status(statusCodes.NotFound).json({
+                msg: "password didn't matched that you entered"
+            })
+        }
+
+        const token = await userResponse.generateAuthTokens();
+        res.status(statusCodes.Success).json({
+            msg: "Signin successfully",
+            user: userResponse,
+            token: token
+        })
+
+    } catch (e) {
+        res.status(statusCodes.ServerError).json({
+            message: "Login failed an server error occurred."
+        })
+    }
 })
 
 
