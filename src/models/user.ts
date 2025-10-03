@@ -1,8 +1,8 @@
 import mongoose, { Model } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { config, string } from "zod";
-import config form "../"
+import { string } from "zod";
+import {config} from "../config"
 
 
 interface User {
@@ -42,3 +42,13 @@ userSchema.methods.generateAuthTokens = function () {
     return jwt.sign({_id : this._id},config.JWT_SECRET);
 }
 
+userSchema.statics.hashPassword = async (password :string)=>{
+    return await bcrypt.hash(password, 10);
+}
+
+userSchema.methods.matchPassword = async function(password: string) {
+    return await bcrypt.compare(password, this.password);
+}
+
+const UserModel = mongoose.model<User, UserModelType>("User", userSchema);
+export default UserModel;

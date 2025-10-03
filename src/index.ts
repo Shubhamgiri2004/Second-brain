@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { statusCodes } from "./constants/statusCodes";
+import UserModel from "./models/user";
 import { signValidation, contentValidation, UserType } from "./middleware/validation";
 
 
@@ -18,19 +19,42 @@ app.get("/", (req: Request, res: Response) => {
 app.post("/signup", async (req, res) => {
     const parseResult = signValidation.safeParse(req.body);
 
-    if (!parseResult) {
+    if (!parseResult.success) {
         return res.status(statusCodes.NotFound).json({
             message: "Wrong input form user"
         })
     }
     try {
         const { username, password} : UserType = parseResult.data;
-        const existingUser = await UseModel.findOne({username});
+        const existingUser = await UserModel.findOne({username});
         
+        if(!existingUser) return res.json({
+            message: "Username already exists."
+        })
 
+        const hashPassword = await UserModel.hashPassword(password);
+        const userResponse = await UserModel.create({ username: username, password: hashPassword})
+        if(!userResponse) return res.json({
+            message: "User can't created"
+        })
+
+        const token = userResponse.generateAuthTokens();
+        return res.send(statusCodes.Success).json({
+            msg: "User created successfully",
+            user: userResponse,
+            token: token
+        })
+    } catch (e) {
+        res.send(statusCodes.ServerError).json({
+            message: "User can't created Internal server error occurred"
+        })
     }
 })
 
+
+app.post("/signIn",  async (req, res)=>{
+
+})
 
 
 
