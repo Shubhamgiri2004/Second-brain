@@ -16,3 +16,17 @@ declare global{
         }
     }
 }
+
+export const auth = async (req: Request, res : Response)=>{
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) {
+            res.status(statusCodes.NotFound).json({
+                msg: "No token Provided"
+            })
+        }
+        const token = authHeader?.split(" ")[1];
+        const decode = jwt.verify(token as string, config.JWT_SECRET) as customPayload
+    }
+    
+}
