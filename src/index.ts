@@ -2,7 +2,8 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { statusCodes } from "./constants/statusCodes";
 import UserModel from "./models/user";
-import { signValidation, contentValidation, UserType } from "./middleware/validation";
+import { auth } from "./middleware/auth";
+import { signValidation, contentValidation, UserType, contentType } from "./middleware/validation";
 
 
 const app = express();
@@ -93,7 +94,43 @@ app.post("/signIn",  async (req, res)=>{
 })
 
 app.post("/content", auth, async (req, res)=>{
-    
+    const parseResult = contentValidation.safeParse(req.body);
+    if(!parseResult.success) {
+        return res.status(statusCodes.NotFound).json({
+            msg: "Wrong Input",
+            error : parseResult.error
+        });
+    }
+
+    try {
+        const userId = req.userId;
+        const {link , title, type, tags }: contentType = parseResult.data;
+        let contentResponse, tagIds;
+
+        if(!tags || tags.length===0 || tags[0] === "") {
+            let newLink : string | null = link;
+            if(type === "Video") {
+                const resp = getYoutubeVideo(link)
+                if(resp === null) {
+                    res.status(statusCodes.NotFound).json({
+                        message: "Content not created"
+                    })
+                } else {
+                    newLink = resp;
+                }
+            }
+            else if(type == "Tweet") {
+                
+            }
+        }
+
+
+
+    } catch (error) {
+        res.status(statusCodes.ServerError).json({
+            message: "A server error occurred"
+        })
+    }
 })
 
 
