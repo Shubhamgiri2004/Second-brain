@@ -46,7 +46,7 @@ export function getYoutubeVideoId(url: string): string | null {
     }
 }
 
-function extractTweet(url: string): string | null {
+export function extractTweet(url: string): string | null {
     try {
 
         const parsedUrl = new  URL(url);

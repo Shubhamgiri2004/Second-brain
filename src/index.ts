@@ -3,6 +3,7 @@ import cors from "cors";
 import { statusCodes } from "./constants/statusCodes";
 import UserModel from "./models/user";
 import { auth } from "./middleware/auth";
+import { getYoutubeVideoId, extractTweet } from "./util";
 import { signValidation, contentValidation, UserType, contentType } from "./middleware/validation";
 
 
@@ -110,7 +111,7 @@ app.post("/content", auth, async (req, res)=>{
         if(!tags || tags.length===0 || tags[0] === "") {
             let newLink : string | null = link;
             if(type === "Video") {
-                const resp = getYoutubeVideo(link)
+                const resp = getYoutubeVideoId(link)
                 if(resp === null) {
                     res.status(statusCodes.NotFound).json({
                         message: "Content not created"
@@ -120,7 +121,7 @@ app.post("/content", auth, async (req, res)=>{
                 }
             }
             else if(type == "Tweet") {
-                
+
             }
         }
 
