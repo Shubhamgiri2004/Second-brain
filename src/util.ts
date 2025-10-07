@@ -9,7 +9,7 @@ export function generateRandomString(length: number){
     return result;
 }
 
-function getYoutubeVideoId(ur: string): string | null {
+function getYoutubeVideoId(url: string): string | null {
     if(!url.includes("youtu")) return null;
     try{
         const parsedUrl = new URL(url);
@@ -23,10 +23,24 @@ function getYoutubeVideoId(ur: string): string | null {
         if(parsedUrl.hostname.includes("youtube.com")){
             const vParam = parsedUrl.searchParams.get("v");
             if(vParam) return vParam;
-            
-            return parsedUrl.pathname.s
+
+            //case 3: Embed link
+            if(parsedUrl.pathname.startsWith("/embed/")) {
+                return parsedUrl.pathname.split("/")[2] ?? null;
+            }
+
+            //case 4: Shorts link
+            if(parsedUrl.pathname.startsWith("/shorts/")) {
+                return parsedUrl.pathname.split("/")[2] ?? null;
+            }
+
+            // case 5 : Live link 
+            if(parsedUrl.pathname.startsWith("/live/")) {
+                return parsedUrl.pathname.split("/")[2] ?? null;
+            }
         }
 
+        return null;
     } catch(error){
        return null;
     }
