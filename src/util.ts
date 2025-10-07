@@ -9,7 +9,7 @@ export function generateRandomString(length: number){
     return result;
 }
 
-function getYoutubeVideoId(url: string): string | null {
+export function getYoutubeVideoId(url: string): string | null {
     if(!url.includes("youtu")) return null;
     try{
         const parsedUrl = new URL(url);
@@ -43,5 +43,25 @@ function getYoutubeVideoId(url: string): string | null {
         return null;
     } catch(error){
        return null;
+    }
+}
+
+function extractTweet(url: string): string | null {
+    try {
+
+        const parsedUrl = new  URL(url);
+        const segments = parsedUrl.pathname.split("/");
+
+        const statusIndex = segments.findIndex(segments => segments=== "status");
+        const tweetId = segments[statusIndex + 1];
+
+        if(statusIndex !== -1 && tweetId && /^\d+$/.test(tweetId)){
+            return tweetId;
+        }
+
+        return null;
+
+    } catch(error) {
+        return null;
     }
 }
