@@ -121,8 +121,16 @@ app.post("/content", auth, async (req, res)=>{
                 }
             }
             else if(type == "Tweet") {
-
+                newLink = extractTweet(link);
+                if(newLink == null) {
+                    return res.status(statusCodes.NotFound).json({
+                        msg: "Tweet link can't be null"
+                    })
+                }
+                contentResponse = await contentModel.create({userId, link:newLink, type, id});
             }
+
+            else if(type == )
         }
 
 
