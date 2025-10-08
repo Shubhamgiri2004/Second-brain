@@ -1,31 +1,50 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
-type Type = "Link" | "Video" | "image" | "Tweet";
+type Type = "Link" | "Video" | "Image" | "Tweet";
 
 interface ContentData {
-    link : String;
-    type : Type;
-    title : String;
-    tags? : mongoose.ObjectId[];
-    userId : mongoose.ObjectId[];
+  link: string;
+  type: Type;
+  title: string;
+  tags?: Types.ObjectId[];
+  userId: Types.ObjectId;
 }
 
-const contentSchema = new mongoose.Schema<ContentData> ({
-    link : {
-        required : true,
-        type: String
+const contentSchema = new Schema<ContentData>(
+  {
+    link: {
+      type: String,
+      required: true,
     },
 
-    type : {
-        required: true,
-        enum : ["Link", "Video", "Image", "Tweet"]
+    type: {
+      type: String,
+      required: true,
+      enum: ["Link", "Video", "Image", "Tweet"],
     },
 
-    title : {
-        required: true,
-        type: String,
+    title: {
+      type: String,
+      required: true,
     },
 
-    
+    tags: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Tags",
+      },
+    ],
 
-})
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+  },
+  {
+    timestamps: true,
+  } 
+);
+
+const Content = mongoose.model<ContentData>("Content", contentSchema);
+
+export default Content;
