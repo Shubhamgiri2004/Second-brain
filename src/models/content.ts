@@ -45,6 +45,6 @@ const contentSchema = new Schema<ContentData>(
   } 
 );
 
-const Content = mongoose.model<ContentData>("Content", contentSchema);
+const ContentModel = mongoose.model<ContentData>("Content", contentSchema);
 
-export default Content;
+export default ContentModel;

@@ -5,6 +5,7 @@ import UserModel from "./models/user";
 import { auth } from "./middleware/auth";
 import { getYoutubeVideoId, extractTweet } from "./util";
 import { signValidation, contentValidation, UserType, contentType } from "./middleware/validation";
+import ContentModel from "./models/content";
 
 
 const app = express();
@@ -27,16 +28,16 @@ app.post("/signup", async (req, res) => {
         })
     }
     try {
-        const { username, password} = parseResult.data;
-        const existingUser = await UserModel.findOne({username});
-        
-        if(!existingUser) return res.json({
+        const { username, password } = parseResult.data;
+        const existingUser = await UserModel.findOne({ username });
+
+        if (!existingUser) return res.json({
             message: "Username already exists."
         })
 
         const hashPassword = await UserModel.hashPassword(password);
-        const userResponse = await UserModel.create({ username: username, password: hashPassword})
-        if(!userResponse) return res.json({
+        const userResponse = await UserModel.create({ username: username, password: hashPassword })
+        if (!userResponse) return res.json({
             message: "User can't created"
         })
 
@@ -54,27 +55,27 @@ app.post("/signup", async (req, res) => {
 })
 
 
-app.post("/signIn",  async (req, res)=>{
+app.post("/signIn", async (req, res) => {
     const parseResult = signValidation.safeParse(req.body);
 
-    if(!parseResult.success) {
+    if (!parseResult.success) {
         return res.status(statusCodes.NotFound).json({
             message: "User can't be find. Please login again"
         })
     }
 
-    try{
-        const {username, password} = parseResult.data;
-        const userResponse = await UserModel.findOne({username}).select("+password");
+    try {
+        const { username, password } = parseResult.data;
+        const userResponse = await UserModel.findOne({ username }).select("+password");
 
-        if(!userResponse){
+        if (!userResponse) {
             return res.status(statusCodes.NotFound).json({
                 message: "user can't find "
             })
         }
 
         const match = await userResponse.matchPassword(password);
-        if(!match) {
+        if (!match) {
             return res.status(statusCodes.NotFound).json({
                 msg: "password didn't matched that you entered"
             })
@@ -94,25 +95,26 @@ app.post("/signIn",  async (req, res)=>{
     }
 })
 
-app.post("/content", auth, async (req, res)=>{
+//To post content Route
+app.post("/content", auth, async (req, res) => {
     const parseResult = contentValidation.safeParse(req.body);
-    if(!parseResult.success) {
+    if (!parseResult.success) {
         return res.status(statusCodes.NotFound).json({
             msg: "Wrong Input",
-            error : parseResult.error
+            error: parseResult.error
         });
     }
 
     try {
         const userId = req.userId;
-        const {link , title, type, tags }: contentType = parseResult.data;
+        const { link, title, type, tags }: contentType = parseResult.data;
         let contentResponse, tagIds;
 
-        if(!tags || tags.length===0 || tags[0] === "") {
-            let newLink : string | null = link;
-            if(type === "Video") {
+        if (!tags || tags.length === 0 || tags[0] === "") {
+            let newLink: string | null = link;
+            if (type === "Video") {
                 const resp = getYoutubeVideoId(link)
-                if(resp === null) {
+                if (resp === null) {
                     res.status(statusCodes.NotFound).json({
                         message: "Content not created"
                     })
@@ -120,21 +122,28 @@ app.post("/content", auth, async (req, res)=>{
                     newLink = resp;
                 }
             }
-            else if(type == "Tweet") {
+            else if (type == "Tweet") {
                 newLink = extractTweet(link);
-                if(newLink == null) {
+                if (newLink == null) {
                     return res.status(statusCodes.NotFound).json({
                         msg: "Tweet link can't be null"
                     })
                 }
-                contentResponse = await contentModel.create({userId, link:newLink, type, id});
+                contentResponse = await ContentModel.create({ userId, link: newLink, type, tags: tagIds });
+            }
+            if (!contentResponse) {
+                return res.status(statusCodes.NotFound).json({
+                    message: "Content Not created"
+                })
             }
 
-            else if(type == )
+            if (contentResponse) {
+                return res.status(statusCodes.Success).json({
+                    message: "Content created Successfully",
+                    Content: contentResponse
+                })
+            }
         }
-
-
-
     } catch (error) {
         res.status(statusCodes.ServerError).json({
             message: "A server error occurred"
