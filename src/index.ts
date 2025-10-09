@@ -152,7 +152,33 @@ app.post("/content", auth, async (req, res) => {
 })
 
 
+// T0 get content
+app.get("/content",auth, async(req, res) =>{
 
+    try {
+        const userId = req.userId;
+        const contentRes = await UserModel.find({ userId}).populate("userId tags");
+        if(!contentRes) {
+            return res.status(statusCodes.NotFound).json({
+                message: "Content Not found"
+            })
+        }
+
+        const content = contentRes.map((x)=> ({
+            title: x.title,
+            link: x.link,
+            type: x.type,
+            id: x._id,
+            
+
+        }))
+
+    } catch (error) {
+        res.status(statusCodes.ServerError).json({
+            message: "Server error occurred"
+        })
+    }
+})
 
 
 
