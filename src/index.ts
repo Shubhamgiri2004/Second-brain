@@ -6,6 +6,7 @@ import { auth } from "./middleware/auth";
 import { getYoutubeVideoId, extractTweet } from "./util";
 import { signValidation, contentValidation, UserType, contentType } from "./middleware/validation";
 import ContentModel from "./models/content";
+import mongoose from "mongoose";
 
 
 const app = express();
@@ -191,6 +192,27 @@ app.get("/content", auth, async (req, res) => {
     }
 })
 
+
+// to delete 
+app.delete("/delete", auth, async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { contentId } = req.body;
+        if (!mongoose.Types.ObjectId.isValid(contentId)) {
+            return res.status(statusCodes.NotFound).json({
+                message: "content not found"
+            });
+        };
+        await ContentModel.deleteOne({ _id: contentId, userId });
+        res.status(statusCodes.Success).json({
+            message: "Content deleted with specific id"
+        })
+    } catch (error) {
+        res.status(statusCodes.ServerError).json({
+            message: "Server error occurred"
+        })
+    }
+})
 
 
 
