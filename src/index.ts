@@ -153,26 +153,37 @@ app.post("/content", auth, async (req, res) => {
 
 
 // T0 get content
-app.get("/content",auth, async(req, res) =>{
+app.get("/content", auth, async (req, res) => {
 
     try {
         const userId = req.userId;
-        const contentRes = await UserModel.find({ userId}).populate("userId tags");
-        if(!contentRes) {
+        const contentRes = await ContentModel.find({ userId }).populate("userId tags");
+        if (!contentRes.length) {
             return res.status(statusCodes.NotFound).json({
                 message: "Content Not found"
             })
         }
 
-        const content = contentRes.map((x)=> ({
+        const content = contentRes.map((x) => ({
             title: x.title,
             link: x.link,
             type: x.type,
             id: x._id,
-            
+            tags: (x.tags ?? []).map((t) =>
+                typeof t === "object" && "tag" in t ? t.tag : String(t)
+            ),
+            timeStamp: new Date(x.createdAt ?? new Date()).toLocaleDateString("en-IN", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            }),
 
-        }))
+        }));
 
+        return res.status(statusCodes.Success).json({
+            message: "Content fetched successfully",
+            content
+        });
     } catch (error) {
         res.status(statusCodes.ServerError).json({
             message: "Server error occurred"

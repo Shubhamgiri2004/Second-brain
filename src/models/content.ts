@@ -8,6 +8,8 @@ interface ContentData {
   title: string;
   tags?: Types.ObjectId[];
   userId: Types.ObjectId;
+  createdAt?: Date;   
+  updatedAt?: Date;
 }
 
 const contentSchema = new Schema<ContentData>(
