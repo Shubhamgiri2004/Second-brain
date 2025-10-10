@@ -3,10 +3,11 @@ import cors from "cors";
 import { statusCodes } from "./constants/statusCodes";
 import UserModel from "./models/user";
 import { auth } from "./middleware/auth";
-import { getYoutubeVideoId, extractTweet } from "./util";
+import { getYoutubeVideoId, extractTweet, generateRandomString } from "./util";
 import { signValidation, contentValidation, UserType, contentType } from "./middleware/validation";
 import ContentModel from "./models/content";
 import mongoose from "mongoose";
+import linkModel from "./models/link";
 
 
 const app = express();
@@ -215,7 +216,41 @@ app.delete("/delete", auth, async (req, res) => {
 })
 
 
+// To share
+app.post("/brain/share", auth, async (req, res) => {
 
+    try {
+        const userId = req.userId;
+        const share = req.body.share;
+
+        if (share) {
+            const existShare = await linkModel.findOne({ userId });
+            if (!existShare) {
+                return res.status(statusCodes.NotFound).json({
+                    message: "content doesn't exists"
+                });
+            }
+            const link = generateRandomString(10);
+            const Response = await linkModel.create({ link, userId });
+            if (Response) {
+                res.status(statusCodes.Success).json({
+                    message: "Link created successfully",
+                    link: Response.link
+                })
+            } else {
+                await linkModel.deleteOne({ userId });
+                res.status(statusCodes.NotFound).json({
+                    message: "Link deleted successfully"
+                })
+            }
+        }
+
+    } catch (error) {
+        res.status(statusCodes.ServerError).json({
+            message: "Server Error Occurred"
+        })
+    }
+})
 
 
 
