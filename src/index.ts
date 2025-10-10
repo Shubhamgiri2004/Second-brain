@@ -244,16 +244,19 @@ app.post("/brain/share", auth, async (req, res) => {
                 })
             }
         }
+        return res.status(statusCodes.NotFound).json({
+            message: "server error occurred"
+        })
 
     } catch (error) {
         res.status(statusCodes.ServerError).json({
-            message: "Server Error Occurred"
+            message: "An Internal Server Error Occurred"
         })
     }
 })
 
 
-
+ 
 
 
 
