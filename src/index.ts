@@ -256,7 +256,16 @@ app.post("/brain/share", auth, async (req, res) => {
 })
 
 
- 
+// To share Link
+app.get("/brain/:shareLink", auth, async (req, res)=>{
+    try {
+
+    } catch (error) {
+        res.status(statusCodes.ServerError).json({
+            message: "Internal server Error occurred"
+        });
+    };
+})
 
 
 
