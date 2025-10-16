@@ -10,9 +10,9 @@ const useThemeDetector = ()=>{
     });
 
     useEffect(()=>{
-        const darkThemeMq = window.matchMedia("(prefer-color-theme: dark)").matches;
-        darkThemeMq.addListener(mqListener);
-        return () => darkThemeMq.removeListener(mqListener);
+        const darkThemeMq = window.matchMedia("(prefer-color-theme: dark)");
+        darkThemeMq.addEventListener("change", mqListener);
+        return () => darkThemeMq.removeEventListener("change", mqListener);
     },[]);
     return isDarkTheme;
 }
