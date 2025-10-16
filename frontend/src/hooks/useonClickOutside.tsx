@@ -19,8 +19,8 @@ function useOnCLickOutSide( ref : any, handler : (event: any)=>void) {
 
         // now cleaning up the event listener on unmount
         return ()=>{
-            document.addEventListener("mousedown", Listener);
-            document.addEventListener("touchstart", Listener);
+            document.removeEventListener("mousedown", Listener);
+            document.removeEventListener("touchstart", Listener);
         };
     }, [ref, handler]);
 }
